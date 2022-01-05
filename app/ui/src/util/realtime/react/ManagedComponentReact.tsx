@@ -6,10 +6,11 @@ import React, {
   useRef,
 } from 'react'
 import {DataManagerContext} from '.'
+import {asArray} from '..'
 import {ManagedComponent, ManagedComponentProps} from '../ManagedComponent'
 
 type ManagedComponentReactParams<T extends ManagedComponent<any>> = {
-  keys: string[]
+  keys: string[] | string
   component: new (element: HTMLElement) => T
   props?: ManagedComponentProps<T>
 }
@@ -48,7 +49,7 @@ export const ManagedComponentReact = <P extends ManagedComponent>({
 
   useEffect(() => {
     if (!plotRef.current) return
-    plotRef.current.keys = keys
+    plotRef.current.keys = asArray(keys)
   }, [keys])
 
   useEffect(() => {

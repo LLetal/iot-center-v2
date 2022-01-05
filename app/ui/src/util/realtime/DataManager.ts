@@ -1,9 +1,4 @@
-import {
-  DiagramEntryPoint,
-  MinAndMax,
-  pushBigArray,
-  simplifyDiagramEntryPointToMaxPoints,
-} from '.'
+import { MinAndMax, pushBigArray, DiagramEntryPoint, simplifyDiagramEntryPointToMaxPoints, } from '.'
 
 const DAY_MILLIS = 24 * 60 * 60 * 1000
 
@@ -50,13 +45,13 @@ const mergeMinMax = (
   if (!mms.some((x) => x)) return undefined
   let min = Infinity
   let max = -Infinity
-  for (let i = mms.length; i--; ) {
+  for (let i = mms.length; i--;) {
     const mm = mms[i]
     if (!mm) continue
     min = Math.min(min, mm.min)
     max = Math.max(max, mm.max)
   }
-  return {min, max}
+  return { min, max }
 }
 
 const sortLine = (arr: TimeValue[]) => {
@@ -82,9 +77,9 @@ const timeValueLinesToDiagramEntryPoint = (
   nonNullKeys.forEach((key) => {
     const line = lines[key]
     if (!line) return
-    for (let i = line.length; i--; ) {
+    for (let i = line.length; i--;) {
       const [time, value] = line[i]
-      arr[lastIndex] = {key, time, value}
+      arr[lastIndex] = { key, time, value }
       lastIndex++
     }
   })
@@ -107,21 +102,21 @@ const diagramEntryPointsToMapTimePoints = (
   const pointHashMap: Map<number, LatLonTime> = new Map()
   const points: LatLonTime[] = new Array(lats.length)
 
-  for (let i = lats.length; i--; ) {
-    const {time, value} = lats[i]
+  for (let i = lats.length; i--;) {
+    const { time, value } = lats[i]
     const point: LatLonTime = [value, undefined as any, time]
     pointHashMap.set(time, point)
     points[i] = point
   }
 
-  for (let i = lons.length; i--; ) {
-    const {time, value} = lons[i]
+  for (let i = lons.length; i--;) {
+    const { time, value } = lons[i]
     const entry = pointHashMap.get(time)
     if (entry) entry[1] = value
   }
 
   let length = points.length
-  for (let i = length; i--; ) {
+  for (let i = length; i--;) {
     if (points[i][1] === undefined) {
       length--
       points[i] = points[length]
@@ -180,6 +175,9 @@ export class DataManager {
   private _retentionTimeMs = Infinity
   private _retentionTimeMsLastUpdated = 0
 
+  // remove after changed keys implemented
+  private _allKeys: Record<string, true> = {}
+
   // todo: use this for no data at react state
   get availebleFields(): string[] {
     throw new Error('not implemented')
@@ -202,8 +200,8 @@ export class DataManager {
     this._onChangeCallbacks.forEach((callback) =>
       // todo: optimize by checking what realy changed
       callback({
-        changedKeys: Object.keys(this._data),
-        lastValueChangedKeys: Object.keys(this._data),
+        changedKeys: Object.keys(this._allKeys),
+        lastValueChangedKeys: Object.keys(this._allKeys),
         retentionChanged: true,
         target: this,
         timeWindowChanged: true,
@@ -227,7 +225,7 @@ export class DataManager {
   /** returns range where max=now, min=max-retentionTime */
   get liveTimeWindow(): MinAndMax | undefined {
     if (this.retentionUsed)
-      return {max: Date.now(), min: Date.now() - this.retentionTimeMs}
+      return { max: Date.now(), min: Date.now() - this.retentionTimeMs }
   }
 
   public timeWindowRasterSize = 100
@@ -235,11 +233,11 @@ export class DataManager {
   get timeWindow(): MinAndMax | undefined {
     const window = this.liveTimeWindow
     if (window) {
-      const {min, max} = window
+      const { min, max } = window
       const r = this.timeWindowRasterSize
       const minr = Math.floor(min / r) * r
       const maxr = Math.ceil(max / r) * r
-      return {min: minr, max: maxr}
+      return { min: minr, max: maxr }
     }
   }
 
@@ -267,6 +265,7 @@ export class DataManager {
       const newLines = DiagramEntryPointsToTimeValueLines(newData)
       pushTimeValueLines(this._data, newLines)
       this._clearSimplifiedCacheForKeys(Object.keys(newLines))
+      Object.keys(newLines).forEach((x) => (this._allKeys[x] = true))
     }
 
     this.applyRetentionOnData()
@@ -298,8 +297,8 @@ export class DataManager {
       const data = this._data[key]
       this._simplifiedDataCache[key] = data
         ? simplifyDiagramEntryPointToMaxPoints(
-            data.map(([time, value]) => ({time, value, key}))
-          )
+          data.map(([time, value]) => ({ time, value, key }))
+        )
         : []
     }
 
@@ -312,7 +311,7 @@ export class DataManager {
     }
     const line = this._data[keys]
     const len = line?.length
-    return len ? {min: line[0][0], max: line[len - 1][0]} : undefined
+    return len ? { min: line[0][0], max: line[len - 1][0] } : undefined
   }
 
   getLatestDataPoint(keys: string[] | string): DiagramEntryPoint | undefined {
@@ -327,14 +326,14 @@ export class DataManager {
     const line = this._data[keys]
     const lastPoint = line?.[line?.length - 1]
     return lastPoint
-      ? {key: keys, time: lastPoint[0], value: lastPoint[1]}
+      ? { key: keys, time: lastPoint[0], value: lastPoint[1] }
       : undefined
   }
 
   getMask(keys: string[] | string): string {
     const minMax = this.getDataTimeMinMax(keys)
     if (!minMax) return ''
-    const {max, min} = minMax
+    const { max, min } = minMax
     if (min + 3 * DAY_MILLIS < max) return MASK_DATE
     else if (min + DAY_MILLIS < max) return MASK_DATE_TIME
     else return MASK_TIME

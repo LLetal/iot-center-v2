@@ -21,7 +21,7 @@ import {GaugeOptions, LineOptions, Datum} from '@antv/g2plot'
 import {Table as GiraffeTable} from '@influxdata/giraffe'
 import {VIRTUAL_DEVICE} from '../App'
 import {DeviceInfo} from './DevicesPage'
-import {DiagramEntryPoint, useWebSocket} from '../util/realtime'
+import {DiagramEntryPoint} from '../util/realtime'
 import {queryTable} from '../util/queryTable'
 import {
   asArray,
@@ -30,11 +30,11 @@ import {
   ManagedMap,
   ManagedSvg,
   MinAndMax,
-} from '../util/realtime/managed'
-import {DataManagerContextProvider} from '../util/realtime/managed/react'
+} from '../util/realtime'
+import {DataManagerContextProvider, useWebSocket} from '../util/realtime/react'
 import Markdown from '../util/Markdown'
 import {UploadOutlined} from '@ant-design/icons'
-import {ManagedComponentReact} from '../util/realtime/managed/react/ManagedComponentReact'
+import {ManagedComponentReact} from '../util/realtime/react/ManagedComponentReact'
 
 //TODO: escalations instead of console.error
 //TODO: file upload JSON definition of dashboardu with JSON schema for validation

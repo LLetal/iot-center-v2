@@ -1,7 +1,6 @@
-import {Gauge, Line, Plot} from '@antv/g2plot'
-import {DataManagerOnChangeEvent, linearScale, MASK_TIME} from '..'
-import {throwReturn} from '../..'
-import {ManagedComponent} from '../ManagedComponent'
+import { Gauge, Line, Plot } from '@antv/g2plot'
+import { DataManagerOnChangeEvent, linearScale, MASK_TIME, throwReturn } from '..'
+import { ManagedComponent } from '../ManagedComponent'
 
 export type PlotConstructor = new (...args: any[]) => Plot<any>
 export type PlotStringConstructor = 'line' | 'gauge' | PlotConstructor
@@ -26,8 +25,8 @@ const g2PlotDefaults = {
 }
 
 const containsAtLeastOneSameValue = <T>(arr: T[], arr2: T[]) => {
-  for (let i = arr.length; i--; ) {
-    for (let j = arr2.length; j--; ) {
+  for (let i = arr.length; i--;) {
+    for (let j = arr2.length; j--;) {
       if (arr[i] === arr[j]) return true
     }
   }
@@ -42,8 +41,8 @@ const getG2Constructor = (plotType: PlotStringConstructor) => {
     ? plotType === 'gauge'
       ? Gauge
       : plotType === 'line'
-      ? Line
-      : throwReturn<PlotConstructor>(
+        ? Line
+        : throwReturn<PlotConstructor>(
           `invalid plotType string! expected line or gauge, got ${plotType}`
         )
     : plotType
@@ -67,7 +66,7 @@ export class ManagedG2Plot extends ManagedComponent<{
   }
 
   private _getData() {
-    const {manager, ctor, options, keys} = this
+    const { manager, ctor, options, keys } = this
 
     if (ctor !== Gauge) {
       return manager.calculateSimplifyedData(keys)
@@ -117,7 +116,7 @@ export class ManagedG2Plot extends ManagedComponent<{
   }
 
   private _getOptions() {
-    const {manager, ctor, options} = this
+    const { manager, ctor, options } = this
 
     const mask = manager.getMask(this.keys)
     const retentionUsed = manager.retentionUsed
@@ -129,35 +128,35 @@ export class ManagedG2Plot extends ManagedComponent<{
 
     const data = this._getData()
 
-    const dataObj = ctor !== Gauge ? {data} : {percent: data}
+    const dataObj = ctor !== Gauge ? { data } : { percent: data }
 
     const res = {
       ...g2PlotDefaults,
-      ...(retentionUsed ? {padding: [22, 28]} : {}),
+      ...(retentionUsed ? { padding: [22, 28] } : {}),
       ...options,
       xAxis: {
         ...g2PlotDefaults?.xAxis,
         ...dataTimeMinMax,
         ...(typeof dataTimeMinMax === 'object'
           ? {
-              tickMethod: () =>
-                retentionUsed
-                  ? linearScale(
-                      now - retentionTimeMs,
-                      dataTimeMinMax.max,
-                      8
-                    ).map(Math.round)
-                  : linearScale(dataTimeMinMax.min, dataTimeMinMax.max, 8).map(
-                      Math.round
-                    ),
-            }
+            tickMethod: () =>
+              retentionUsed
+                ? linearScale(
+                  now - retentionTimeMs,
+                  dataTimeMinMax.max,
+                  8
+                ).map(Math.round)
+                : linearScale(dataTimeMinMax.min, dataTimeMinMax.max, 8).map(
+                  Math.round
+                ),
+          }
           : {}),
         ...(retentionUsed
           ? {
-              min: now - retentionTimeMs,
-              // tickMethod: 'wilkinson-extended',
-              // tickMethod: 'time-cat',
-            }
+            min: now - retentionTimeMs,
+            // tickMethod: 'wilkinson-extended',
+            // tickMethod: 'time-cat',
+          }
           : {}),
         mask,
         ...options?.xAxis,
