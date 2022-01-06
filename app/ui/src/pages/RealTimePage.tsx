@@ -30,6 +30,7 @@ import {
   DataManager,
   ManagedG2Plot,
   ManagedMap,
+  ManagedSvg,
 } from '../util/realtime'
 import {
   DataManagerContextProvider,
@@ -599,6 +600,32 @@ const RealTimePage: FunctionComponent<
     )
   })()
 
+  const [svgString, setSvgString] = useState('')
+
+  useEffect(() => {
+    const fetchSvgString = async () => {
+      try {
+        const response = await fetch('/IoT_Center_Diagram_v2.svg')
+        const svgString = await response.text()
+        setSvgString(svgString)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    fetchSvgString()
+  }, [])
+
+  const svg = (
+    <Card style={{marginBottom: 24}}>
+      <ManagedComponentReact
+        component={ManagedSvg}
+        keys={fieldsAll}
+        props={{svgString}}
+      ></ManagedComponentReact>
+    </Card>
+  )
+
   const pageControls = (
     <>
       <Tooltip title="Choose device" placement="left">
@@ -696,6 +723,7 @@ const RealTimePage: FunctionComponent<
       <DataManagerContextProvider value={manager}>
         {true ? (
           <>
+            {svg}
             {gauges}
             {plotDivider}
             {geo}
