@@ -231,16 +231,6 @@ const linePlotOptions: Record<
   ])
 )
 
-/** Returns list of keys present in data. */
-const getFieldsOfData = (data: DiagramEntryPoint[]) => {
-  const keysObj: Record<string, true> = {}
-  for (let i = data.length; i--; ) {
-    const entry = data[i]
-    keysObj[entry.key] = true
-  }
-  return Object.getOwnPropertyNames(keysObj)
-}
-
 // #region Realtime
 
 /** Data returned from websocket in line-protocol-like shape */
@@ -257,11 +247,11 @@ type RealtimeSubscription = {
   tags: string[]
 }
 
-const host =
+const HOST =
   process.env.NODE_ENV === `development`
     ? window.location.hostname + ':5000'
     : window.location.host
-const wsAddress = `ws://${host}/mqtt`
+const WS_URL = `ws://${HOST}/mqtt`
 
 /** length of unix time with milliseconds precision */
 const MILLIS_TIME_LENGTH = 13
@@ -269,7 +259,7 @@ const MILLIS_TIME_LENGTH = 13
 const pointTimeToMillis = (p: RealtimePoint): RealtimePoint => ({
   ...p,
   timestamp: p.timestamp
-    .substr(0, MILLIS_TIME_LENGTH)
+    .substring(0, MILLIS_TIME_LENGTH)
     .padEnd(MILLIS_TIME_LENGTH, '0'),
 })
 
@@ -291,7 +281,7 @@ const useRealtimeData = (
     },
     [subscriptions, onReceivePoints]
   )
-  useWebSocket(wsInit, wsAddress, !!subscriptions.length)
+  useWebSocket(wsInit, WS_URL, !!subscriptions.length)
 }
 
 // transformations for both InfluxDB and Realtime sources so we can use them same way independently of the source
